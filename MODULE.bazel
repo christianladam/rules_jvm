@@ -25,6 +25,11 @@ bazel_dep(name = "rules_python", version = "1.6.0", dev_dependency = True)
 bazel_dep(name = "rules_shell", version = "0.6.0", dev_dependency = True)
 bazel_dep(name = "stardoc", version = "0.7.2", dev_dependency = True, repo_name = "io_bazel_stardoc")
 
+# Picks the separator used in generated target names. Root modules can set it with
+# `naming.configure(separator = "_")`; see the "Generated target names" section of the README.
+naming = use_extension("//java:extensions.bzl", "naming")
+use_repo(naming, "contrib_rules_jvm_naming")
+
 linter = use_extension("@apple_rules_lint//lint:extensions.bzl", "linter")
 linter.register(name = "java-checkstyle")
 linter.configure(

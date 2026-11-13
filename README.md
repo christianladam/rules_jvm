@@ -54,6 +54,31 @@ The linters are configured using specific rules. The mappings are:
 | java-pmd | [pmd_ruleset](#pmd_ruleset) |
 | java-spotbugs | [spotbugs_config](#spotbugs_config) |
 
+## Generated target names
+
+Some macros generate extra targets named after the target you declare:
+
+| Macro | Generated targets |
+|-------|-------------------|
+| `java_test_suite` | `<name>-test-lib` (non-test sources), `<name>-test-deps-lib` and `<name>-test-runtime-deps-lib` |
+| `java_library`, `java_binary`, `java_test` and `java_export` (with linting set up) | `<name>-checkstyle`, `<name>-pmd` and `<name>-spotbugs` |
+
+By default, the words are joined with `-`. To use `_` instead (`<name>_test_lib`,
+`<name>_checkstyle` and so on), add this to your root `MODULE.bazel`:
+
+```starlark
+naming = use_extension("@contrib_rules_jvm//java:extensions.bzl", "naming")
+naming.configure(separator = "_")
+```
+
+Only the root module's setting is used, and it applies to every module in the build.
+If you use the Gazelle plugin, also add `# gazelle:java_generated_name_separator _` to
+the BUILD file at the root of your repository, so that tests that use another
+package's test helpers depend on the right `java_test_suite` library.
+
+`java_export` builds on `rules_jvm_external`'s `java_export`, which names its
+library `<name>-lib`. This setting doesn't change that name.
+
 ## Requirements
 
 These rules require Java 11 or above.

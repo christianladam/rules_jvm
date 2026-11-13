@@ -1,0 +1,45 @@
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@contrib_rules_jvm//java:defs.bzl", "java_library", "java_test_suite")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+
+java_library(
+    name = "lib",
+    srcs = ["Greeter.java"],
+)
+
+java_test_suite(
+    name = "ExampleSuite",
+    srcs = [
+        "ExampleTest.java",
+        "TestHelper.java",
+    ],
+    runner = "junit5",
+    runtime_deps = [
+        artifact("org.junit.jupiter:junit-jupiter-engine"),
+    ],
+    deps = [
+        ":lib",
+        artifact("org.junit.jupiter:junit-jupiter-api"),
+        artifact("org.junit.platform:junit-platform-launcher"),
+        artifact("org.junit.platform:junit-platform-reporting"),
+    ],
+)
+
+# Fails to load if `naming.configure(separator = "_")` in MODULE.bazel is ignored.
+build_test(
+    name = "generated_library_names_test",
+    targets = [
+        ":ExampleSuite_test_lib",
+        ":ExampleSuite_test_deps_lib",
+        ":ExampleSuite_test_runtime_deps_lib",
+    ],
+)
+
+test_suite(
+    name = "generated_lint_names_test",
+    tests = [
+        ":lib_checkstyle",
+        ":lib_pmd",
+        ":lib_spotbugs",
+    ],
+)

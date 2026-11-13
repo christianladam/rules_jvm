@@ -501,7 +501,7 @@ func (l javaLang) GenerateRules(args language.GenerateArgs) language.GenerateRes
 					testResourcesRuntimeDep,
 					&res,
 				)
-				// Cache the helper classes under the suite's "<suite>-test-lib" label (the helper
+				// Cache the helper classes under the suite's "<suite>-test-lib" (or "<suite>_test_lib") label (the helper
 				// library the macro emits). The resolver consults this so it only depends on the
 				// helper lib for classes it actually declares -- a class the production provider
 				// doesn't declare may be a main top-level function, not a test helper.
@@ -511,7 +511,7 @@ func (l javaLang) GenerateRules(args language.GenerateArgs) language.GenerateRes
 						helperClassSet.Add(*tf.ClassName())
 					}
 					helperClassSet.AddAll(testHelperDeclaredClasses)
-					helperLabel := label.New("", args.Rel, testHelperLibname(suiteName))
+					helperLabel := label.New("", args.Rel, cfg.TestHelperLibraryName(suiteName))
 					l.classExportCache[helperLabel.String()] = classExportInfo{
 						classes:  helperClassSet.SortedSlice(),
 						testonly: true,
@@ -526,7 +526,7 @@ func (l javaLang) GenerateRules(args language.GenerateArgs) language.GenerateRes
 			for _, src := range sortedSeparateTestJavaFiles.SortedSlice() {
 				var testHelperDep *string
 				if testHelperJavaFiles.Len() > 0 {
-					testHelperDep = ptr(testHelperLibname(suiteName))
+					testHelperDep = ptr(cfg.TestHelperLibraryName(suiteName))
 				}
 				separateJavaTestReasons := separateTestJavaFiles[src]
 				l.generateJavaTest(args.File, args.Rel, cfg.MavenRepositoryName(), src, aggregateAtRoot, testJavaImportsWithHelpers, testJavaImportedClassesWithHelpers, annotationProcessorClasses, testHelperDep, testResourcesDirectRefs, testResourcesRuntimeDep, separateJavaTestReasons.wrapper, separateJavaTestReasons.attributes, &res)
@@ -1124,7 +1124,7 @@ func (l javaLang) processJavaBinary(file *rule.File, rel string, allMains *sorte
 		libName := cfg.MapLibraryName(filepath.Base(rel))
 		if testHelperJavaClasses.Contains(m) {
 			isTestOnly = true
-			libName = testHelperLibname(libName)
+			libName = cfg.TestHelperLibraryName(libName)
 		}
 		l.generateJavaBinary(file, m, libName, isTestOnly, res)
 	}
@@ -1339,10 +1339,6 @@ func labelsToStrings(labels []label.Label) []string {
 		out[idx] = l.String()
 	}
 	return out
-}
-
-func testHelperLibname(targetName string) string {
-	return targetName + "-test-lib"
 }
 
 func ptr[T any](v T) *T {

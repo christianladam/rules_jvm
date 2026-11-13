@@ -1,0 +1,19 @@
+load("@contrib_rules_jvm//java:defs.bzl", "java_test_suite")
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "SomeTestBinary",
+    testonly = True,
+    main_class = "com.example.test.SomeTestBinary",
+    visibility = ["//visibility:public"],
+    runtime_deps = [":test_test_lib"],
+)
+
+java_test_suite(
+    name = "test",
+    srcs = [
+        "SomeOtherTest.java",
+        "SomeTestBinary.java",
+    ],
+    deps = ["@maven//:junit_junit"],
+)

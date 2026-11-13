@@ -85,3 +85,10 @@ bzl_library(
         "@rules_java//java/private:proto_support",
     ],
 )
+
+bzl_library(
+    name = "extensions",
+    srcs = ["extensions.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["//java/private:naming_extension"],
+)

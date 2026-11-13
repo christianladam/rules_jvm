@@ -1,0 +1,2 @@
+# gazelle:java_generated_name_separator _
+# gazelle:resolve java org.junit @maven//:junit_junit

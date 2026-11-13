@@ -5,6 +5,7 @@ load("@rules_java//java:java_library.bzl", _java_library = "java_library")
 load("@rules_java//java:java_test.bzl", _java_test = "java_test")
 load("@rules_jvm_external//:defs.bzl", _java_export = "java_export")
 load("//java/private:checkstyle.bzl", "checkstyle_test")
+load("//java/private:naming.bzl", "generated_name")
 load("//java/private:pmd.bzl", "pmd_test")
 load("//java/private:spotbugs.bzl", "spotbugs_test")
 
@@ -20,7 +21,7 @@ def create_lint_tests(name, **kwargs):
     if checkstyle != None:
         maybe(
             checkstyle_test,
-            name = "%s-checkstyle" % name,
+            name = generated_name(name, "checkstyle"),
             srcs = srcs,
             config = checkstyle,
             # Do not keep the parent tags: we typically want to run lint tests
@@ -33,7 +34,7 @@ def create_lint_tests(name, **kwargs):
     if pmd != None:
         maybe(
             pmd_test,
-            name = "%s-pmd" % name,
+            name = generated_name(name, "pmd"),
             srcs = srcs,
             target = ":%s" % name,
             ruleset = pmd,
@@ -46,7 +47,7 @@ def create_lint_tests(name, **kwargs):
     if spotbugs != None:
         maybe(
             spotbugs_test,
-            name = "%s-spotbugs" % name,
+            name = generated_name(name, "spotbugs"),
             config = spotbugs,
             only_output_jars = True,
             deps = [

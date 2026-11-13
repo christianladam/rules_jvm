@@ -141,6 +141,8 @@ The following directives specific to the Java extension are recognized:
 | Tells the code generator to generate `java_grpc_library` rules when a `proto_library` rule with services is present. Defaults to True. |
 | java_generate_resources                           | True                                     |
 | Tells the code generator to generate `pkg_files` rules for the resources directories, and to attach them to the libraries and tests of the same sourceset (see [Resources](#resources)). Can be either "true" or "false". Defaults to "true". |
+| java_generated_name_separator                     | "-"                                      |
+| The separator `java_test_suite` uses in the names of the targets it generates, such as the `<suite>-test-lib` helper library that tests in other packages depend on. Set it to match contrib_rules_jvm's `naming` module extension (see "Generated target names" in the top-level README), preferably once at the root of the repository. Can be either "-" or "_", defaults to "-". |
 | java_library_naming_convention                    | "{dirname}"                              |
 | Controls the naming of `java_library` and `kt_jvm_library` targets. The value is a template string where `{dirname}` is replaced with the leaf directory name. For example, `lib_{dirname}` would generate a target named `lib_hello` in a directory called `hello`. Defaults to `{dirname}` (the directory name). |
 | java_maven_install_file                           | "maven_install.json"                     |

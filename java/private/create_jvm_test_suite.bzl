@@ -1,4 +1,5 @@
 load("@bazel_skylib//lib:collections.bzl", "collections")
+load("//java/private:naming.bzl", "generated_name")
 load("//java/private:package.bzl", "get_class_name")
 
 def _is_test(src, test_suffixes, test_suffixes_excludes):
@@ -95,7 +96,7 @@ def create_jvm_test_suite(
             fail("test_overrides entry '{}' is not a generated test source".format(src))
 
     if library_srcs:
-        lib_dep_name = "%s-test-lib" % name
+        lib_dep_name = generated_name(name, "test", "lib")
         lib_dep_label = ":%s" % lib_dep_name
         deps_for_library = [dep for dep in deps or [] if _absolutify(dep) != _absolutify(lib_dep_label)]
 
@@ -117,7 +118,7 @@ def create_jvm_test_suite(
     tests = []
 
     # Optimization for classpath, reduces the duplicate dependencies for each test to instead rely on one target
-    deps_lib_name = "%s-test-deps-lib" % name
+    deps_lib_name = generated_name(name, "test", "deps", "lib")
     define_library(
         name = deps_lib_name,
         exports = deps,
@@ -126,7 +127,7 @@ def create_jvm_test_suite(
         testonly = True,
         **library_attrs
     )
-    runtime_deps_lib_name = "%s-test-runtime-deps-lib" % name
+    runtime_deps_lib_name = generated_name(name, "test", "runtime", "deps", "lib")
     define_library(
         name = runtime_deps_lib_name,
         exports = runtime_deps,

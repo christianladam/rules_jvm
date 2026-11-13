@@ -1,0 +1,72 @@
+module(
+    name = "generated_names_example",
+    version = "0.0.0",
+)
+
+bazel_dep(
+    name = "apple_rules_lint",
+    version = "0.4.0",
+)
+bazel_dep(
+    name = "contrib_rules_jvm",
+    version = "0.0.0",
+)
+local_path_override(
+    module_name = "contrib_rules_jvm",
+    path = "../..",
+)
+
+bazel_dep(
+    name = "rules_jvm_external",
+    version = "6.6",
+)
+bazel_dep(
+    name = "bazel_skylib",
+    version = "1.8.1",
+)
+
+# Name generated targets `foo_test_lib`, `foo_checkstyle` and so on, instead of the
+# default `foo-test-lib` and `foo-checkstyle`.
+naming = use_extension("@contrib_rules_jvm//java:extensions.bzl", "naming")
+naming.configure(separator = "_")
+
+linter = use_extension("@apple_rules_lint//lint:extensions.bzl", "linter")
+linter.configure(
+    name = "java-checkstyle",
+    config = "@contrib_rules_jvm//java:checkstyle-default-config",
+)
+linter.configure(
+    name = "java-pmd",
+    config = "@contrib_rules_jvm//java:pmd-config",
+)
+linter.configure(
+    name = "java-spotbugs",
+    config = "@contrib_rules_jvm//java:spotbugs-default-config",
+)
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven",
+    artifacts = [
+        "org.junit.jupiter:junit-jupiter-api:5.8.2",
+        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "org.junit.platform:junit-platform-launcher:1.8.2",
+        "org.junit.platform:junit-platform-reporting:1.8.2",
+        "com.github.spotbugs:spotbugs:4.7.3",
+        "com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0",
+        "com.mebigfatguy.sb-contrib:sb-contrib:7.6.4",
+        "org.jmockit:jmockit:1.38",
+    ],
+    fetch_sources = True,
+    known_contributing_modules = ["bazel_worker_java"],
+    lock_file = "//:maven_install.json",
+)
+use_repo(
+    maven,
+    "maven",
+)
+
+register_toolchains(
+    "@@bazel_skylib//toolchains/unittest:cmd_toolchain",
+    "@@bazel_skylib//toolchains/unittest:bash_toolchain",
+)

@@ -113,6 +113,25 @@ func TestSetNamingConventionValidation(t *testing.T) {
 	}
 }
 
+func TestGeneratedNameSeparator(t *testing.T) {
+	parent := javaconfig.New("/tmp")
+	if got := parent.TestHelperLibraryName("suite"); got != "suite-test-lib" {
+		t.Fatalf("default TestHelperLibraryName = %q, want %q", got, "suite-test-lib")
+	}
+
+	if err := parent.SetGeneratedNameSeparator("."); err == nil {
+		t.Fatal("expected error for separator \".\"")
+	}
+	if err := parent.SetGeneratedNameSeparator("_"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	child := parent.NewChild()
+	if got := child.TestHelperLibraryName("suite"); got != "suite_test_lib" {
+		t.Fatalf("child TestHelperLibraryName = %q, want %q", got, "suite_test_lib")
+	}
+}
+
 func TestOverriddenTestSuffixes(t *testing.T) {
 	for file, want := range map[string]bool{
 		"":                    false,

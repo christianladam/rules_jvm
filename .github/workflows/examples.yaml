@@ -36,3 +36,6 @@ jobs:
 
       - name: bzlmod tests and lints
         run: (cd examples/tests_and_lints && bazel --bazelrc=../../.github/workflows/ci.bazelrc test --enable_bzlmod //...)
+
+      - name: bzlmod generated target names
+        run: (cd examples/generated_names && bazel --bazelrc=../../.github/workflows/ci.bazelrc test --enable_bzlmod //...)

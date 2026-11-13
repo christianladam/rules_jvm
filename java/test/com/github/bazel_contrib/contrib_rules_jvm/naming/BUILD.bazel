@@ -1,0 +1,3 @@
+load(":naming_test.bzl", "naming_test_suite")
+
+naming_test_suite(name = "naming_test")

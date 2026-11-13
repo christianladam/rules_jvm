@@ -69,6 +69,7 @@ func (jc *Configurer) KnownDirectives() []string {
 		javaconfig.JavaExcludeArtifact,
 		javaconfig.JavaExtensionDirective,
 		javaconfig.JavaGenerateBinary,
+		javaconfig.JavaGeneratedNameSeparator,
 		javaconfig.JavaGenerateProto,
 		javaconfig.JavaGenerateProtoServices,
 		javaconfig.JavaGenerateResources,
@@ -303,6 +304,11 @@ func (jc *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 			case javaconfig.JavaTestSuiteNamingConvention:
 				if err := cfg.SetTestSuiteNamingConvention(d.Value); err != nil {
 					jc.lang.logger.Fatal().Err(err).Msgf("invalid value for directive %q", javaconfig.JavaTestSuiteNamingConvention)
+				}
+
+			case javaconfig.JavaGeneratedNameSeparator:
+				if err := cfg.SetGeneratedNameSeparator(d.Value); err != nil {
+					jc.lang.logger.Fatal().Err(err).Msgf("invalid value for directive %q", javaconfig.JavaGeneratedNameSeparator)
 				}
 			}
 		}

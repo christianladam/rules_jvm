@@ -116,6 +116,12 @@ const (
 	// Defaults to "" (unset), which preserves the current behavior (dirname in package mode,
 	// dirname + "-tests" in module mode).
 	JavaTestSuiteNamingConvention = "java_test_suite_naming_convention"
+
+	// JavaGeneratedNameSeparator is the separator java_test_suite uses in the names of the
+	// targets it generates, such as its "<suite>-test-lib" helper library. Set it to match
+	// contrib_rules_jvm's `naming` module extension, preferably once at the repository root.
+	// Can be either "-" or "_". Defaults to "-".
+	JavaGeneratedNameSeparator = "java_generated_name_separator"
 )
 
 // Configs is an extension of map[string]*Config. It provides finding methods
@@ -162,6 +168,7 @@ func (c *Config) NewChild() *Config {
 		libraryNamingConvention:                            c.libraryNamingConvention,
 		testSuiteNamingConvention:                          c.testSuiteNamingConvention,
 		testOnly:                                           c.testOnly,
+		generatedNameSeparator:                             c.generatedNameSeparator,
 	}
 }
 
@@ -204,6 +211,7 @@ type Config struct {
 	libraryNamingConvention                            string
 	testSuiteNamingConvention                          string
 	testOnly                                           bool
+	generatedNameSeparator                             string
 }
 
 type LoadInfo struct {
@@ -239,6 +247,7 @@ func New(repoRoot string) *Config {
 		libraryNamingConvention:                            "{dirname}",
 		testSuiteNamingConvention:                          "{dirname}",
 		testOnly:                                           false,
+		generatedNameSeparator:                             "-",
 	}
 }
 
@@ -507,6 +516,24 @@ func (c *Config) SetTestSuiteNamingConvention(convention string) error {
 	}
 	c.testSuiteNamingConvention = convention
 	return nil
+}
+
+func (c *Config) GeneratedNameSeparator() string {
+	return c.generatedNameSeparator
+}
+
+func (c *Config) SetGeneratedNameSeparator(separator string) error {
+	if separator != "-" && separator != "_" {
+		return fmt.Errorf("possible values are - and _")
+	}
+	c.generatedNameSeparator = separator
+	return nil
+}
+
+// TestHelperLibraryName returns the name of the helper library java_test_suite generates for
+// the suite's non-test sources, e.g. "foo-test-lib" or "foo_test_lib".
+func (c *Config) TestHelperLibraryName(suiteName string) string {
+	return strings.Join([]string{suiteName, "test", "lib"}, c.generatedNameSeparator)
 }
 
 // MapLibraryName returns the library target name for the given directory name.
